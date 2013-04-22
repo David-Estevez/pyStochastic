@@ -8,7 +8,7 @@
 
 	* Velocity is updated with current velocity, a component towards 
 	the best solucion each individual has obtained so far, and a component
-	towards the global best solution      mn
+	towards the global best solution.
 """
 try:
 	import numpy as np
@@ -72,7 +72,10 @@ def PSO( costFunction, v_size, population, iterations = 1000, limits = list(),  
 
 		# Update speed
 		for index in range(0, population):
-			particles_v[index] = particles_v[index] + c1 * np.random.random(1)[0] * ( pBest[index] - particles_p[index] + c2 * np.random.random(1)[0] * ( gBest 
+			particles_v[index] = particles_v[index] + c1 * np.random.random(1)[0] * ( pBest[index] - particles_p[index]) + c2 * np.random.random(1)[0] * ( gBest - particles_p[index])
+			particles_p[index] = particles_p[index] + particles_v[index]
+							
+			
 		# swarm_v = swarm_v + c1 * np.random.random( (v_size, population)) #* best individual position - current position
 		i += 1
 
@@ -86,12 +89,12 @@ def main():
 
 	# Define a cost function
 	def cost( theta):
-		#return ( 1 - theta[0][0])**2 + 100*(theta[1][0] - theta[0][0]**2)**2
-		return ( theta[0][0]**2 + theta[1][0]**2)
+		return ( 1 - theta[0][0])**2 + 100*(theta[1][0] - theta[0][0]**2)**2
+		#return ( theta[0][0]**2 + theta[1][0]**2)
 
 	pass
 
-	swarm, pBest, gBest = PSO( cost, 2, 100, 1 , limits = [20, 20])
+	swarm, pBest, gBest = PSO( cost, 2, 20, 200 , limits = [20, 20])
 
 	plotswarm = [ [], []]
 	plotpBest = [ [], []]
