@@ -15,7 +15,7 @@ try:
 except ImportError:
 	print "Error: numpy not found"
 
-def PSO( costFunction, v_size, population, iterations = 1000, limits = list(),  debug = True):
+def PSO( costFunction, v_size, population, iterations = 1000, limits = list(),  debug = False):
 	# Constants and variables
 	Vmax = 10	# Maximum speed
 	c1 = 2 		# Learning factor
@@ -79,7 +79,10 @@ def PSO( costFunction, v_size, population, iterations = 1000, limits = list(),  
 		# swarm_v = swarm_v + c1 * np.random.random( (v_size, population)) #* best individual position - current position
 		i += 1
 
-	return particles_p, pBest, gBest
+	if debug:
+		return particles_p, pBest, gBest
+	else:
+		return gBest
 
 def main():	
 	try:
@@ -94,7 +97,9 @@ def main():
 
 	pass
 
-	swarm, pBest, gBest = PSO( cost, 2, 20, 200 , limits = [20, 20])
+	swarm, pBest, gBest = PSO( cost, 2, 20, 200 , limits = [20, 20], debug = True)
+
+	print 'Best individual is: (' + str( gBest[0][0]) + ',' + str( gBest[1][0] ) + ')'
 
 	plotswarm = [ [], []]
 	plotpBest = [ [], []]
