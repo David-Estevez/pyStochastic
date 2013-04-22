@@ -8,7 +8,7 @@
 
 	* Velocity is updated with current velocity, a component towards 
 	the best solucion each individual has obtained so far, and a component
-	towards the global best solution
+	towards the global best solution      mn
 """
 try:
 	import numpy as np
@@ -29,21 +29,54 @@ def PSO( costFunction, v_size, population, iterations = 1000, limits = list(),  
 
 	limits_vector = np.vstack( limits)
 
+	# Storage for the particles
+	particles_p = list()
+	particles_v = list()
+
+	pBest = list()
+	pBest_value = list()
+
+	gBest = None
+	gBest_value = None
+
 	# Create initial random population
-	swarm_pos = 2 * limits_vector * ( 0.5 * np.ones(( v_size, population)) - np.random.random((v_size, population)))
-
-	swarm_v = np.zeros( (v_size, population))
-
+	for index in range(0, population):
+		particles_p.append( 2 * limits_vector * ( 0.5 * np.ones(( v_size, 1)) - np.random.random((v_size, 1))) )
+		particles_v.append( np.zeros( (v_size, 1) ) )
+		
+		pBest.append( particles_p[-1] )
+		pBest_value.append( costFunction( pBest[-1]) )
+	
+	#Set an initial value for the best element:
+	gBest = pBest[0]
+	gBest_value = pBest_value[0]
+	
+	# Main loop
+	# -------------------------------------------------------------------------------------------
+	# While current iteration lower that max iterations and current cost is higher that threshold
 	while i < iterations:
-		# Find best
-		costVector = costFunction( swarm)
-		pBest = costVector.argmin()  # Index of the best particle
-		bestValue = costVector.min() # Cost of the best particle
+		# Find local best & global best
+		for index in range( 0, population):
+			cost = costFunction( particles_p[index] )
+	
+			# Find personal best
+			if cost < pBest_value[index]:
+				pBest_value[index] = cost
+				pBest[index] = particles_p[index]
+
+			# Find global best
+			if cost < gBest_value:
+				gBest_value = cost
+				gBest = particles_p[index]
+
 
 		# Update speed
-		swarm_v = swarm_v + c1 * np.random.random( (v_size, population)) #* best individual position - current position
+		for index in range(0, population):
+			particles_v[index] = particles_v[index] + c1 * np.random.random(1)[0] * ( pBest[index] - particles_p[index] + c2 * np.random.random(1)[0] * ( gBest 
+		# swarm_v = swarm_v + c1 * np.random.random( (v_size, population)) #* best individual position - current position
+		i += 1
 
-	return swarm
+	return particles_p, pBest, gBest
 
 def main():	
 	try:
@@ -58,12 +91,24 @@ def main():
 
 	pass
 
-	data = PSO( cost, 2, 100 , limits = [20, 20])
-	data1 = PSO( cost, 2, 100, limits = [50, 50])
-	data2 = PSO( cost, 2, 100, limits = [100, 100])
-	plab.plot( data[0].tolist(), data[1].tolist(), 'b.')
-	plab.plot( data1[0].tolist(), data1[1].tolist(), 'g.')
-	plab.plot( data2[0].tolist(), data2[1].tolist(), 'r.')
+	swarm, pBest, gBest = PSO( cost, 2, 100, 1 , limits = [20, 20])
+
+	plotswarm = [ [], []]
+	plotpBest = [ [], []]
+	plotgBest = [ [], []]
+	
+	for thing in swarm:
+		plotswarm[0].append( thing[0] )
+		plotswarm[1].append( thing[1] )
+
+	for thing in pBest:
+		plotpBest[0].append( thing[0] )
+		plotpBest[1].append( thing[1] )
+
+		
+	plab.plot( plotswarm[0], plotswarm[1], 'b*')
+	plab.plot( plotpBest[0], plotpBest[1], 'y*')
+	plab.plot( gBest[0], gBest[1], 'r*')
 	plab.show()
 
 if __name__ == '__main__':
